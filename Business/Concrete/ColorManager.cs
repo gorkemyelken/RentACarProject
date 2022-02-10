@@ -25,7 +25,7 @@ namespace Business.Concrete
 
         public void Delete(Color color)
         {
-            _colorDal.Delete(color);    
+            _colorDal.Delete(color);
         }
 
         public List<Color> GetAll()
@@ -33,9 +33,9 @@ namespace Business.Concrete
             return _colorDal.GetAll();
         }
 
-        public List<Color> GetById(int id)
+        public Color GetById(int id)
         {
-            return _colorDal.GetAll(c => c.Id == id);
+            return _colorDal.Get(c=>c.Id == id);
         }
 
         public void Update(Color color)
