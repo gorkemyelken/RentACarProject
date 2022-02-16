@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.IO;
 using Core.Utilities.Results;
-using Microsoft.AspNetCore.Http;
 
 namespace Core.Utilities.Helpers
 {
@@ -13,6 +13,12 @@ namespace Core.Utilities.Helpers
 
         public static IResult Upload(IFormFile file)
         {
+            var fileExists = CheckFileExists(file);
+            if (fileExists.Message != null)
+            {
+                return new ErrorResult(fileExists.Message);
+            }
+
             var type = Path.GetExtension(file.FileName);
             var typeValid = CheckFileTypeValid(type);
             var randomName = Guid.NewGuid().ToString();
@@ -21,13 +27,23 @@ namespace Core.Utilities.Helpers
             {
                 return new ErrorResult(typeValid.Message);
             }
+
             CheckDirectoryExists(_currentDirectory + _folderName);
             CreateImageFile(_currentDirectory + _folderName + randomName + type, file);
             return new SuccessResult((_folderName + randomName + type).Replace("\\", "/"));
+
+
+
         }
 
         public static IResult Update(IFormFile file, string imagePath)
         {
+            var fileExists = CheckFileExists(file);
+            if (fileExists.Message != null)
+            {
+                return new ErrorResult(fileExists.Message);
+            }
+
             var type = Path.GetExtension(file.FileName);
             var typeValid = CheckFileTypeValid(type);
             var randomName = Guid.NewGuid().ToString();
@@ -48,6 +64,19 @@ namespace Core.Utilities.Helpers
             DeleteOldImageFile((_currentDirectory + path).Replace("/", "\\"));
             return new SuccessResult();
         }
+
+
+
+
+        private static IResult CheckFileExists(IFormFile file)
+        {
+            if (file != null && file.Length > 0)
+            {
+                return new SuccessResult();
+            }
+            return new ErrorResult("File doesn't exists.");
+        }
+
 
         private static IResult CheckFileTypeValid(string type)
         {
